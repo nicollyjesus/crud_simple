@@ -17,14 +17,15 @@ import java.util.UUID;
 public class ProductController {
     @Autowired
     private ProductRepository repository;
+
     @GetMapping
-    public ResponseEntity getAllProducts(){
+    public ResponseEntity getAllProducts() {
         var allProducts = repository.findAll();
         return ResponseEntity.ok(allProducts);
     }
 
     @PostMapping
-    public ResponseEntity registerProduct(@RequestBody @Valid RequestProduct data){
+    public ResponseEntity registerProduct(@RequestBody @Valid RequestProduct data) {
         Product newProduct = new Product(data);
         repository.save(newProduct);
         return ResponseEntity.ok().build();
@@ -32,7 +33,7 @@ public class ProductController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity updateProduct(@RequestBody @Valid RequestProduct data){
+    public ResponseEntity updateProduct(@RequestBody @Valid RequestProduct data) {
         Optional<Product> optionalProduct = repository.findById(data.id());
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -44,4 +45,14 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteProduct(@PathVariable UUID id) {
+        Optional<Product> optionalProduct = repository.findById(id);
+        if (optionalProduct.isPresent()) {
+            repository.deleteById(id);
+            return ResponseEntity.ok("Produto deletado com sucesso!");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
